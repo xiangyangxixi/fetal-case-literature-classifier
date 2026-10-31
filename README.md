@@ -38,3 +38,15 @@ Input: `.csv/.tsv/.jsonl` with columns `pmid,title,abstract` (optional `pub_type
 3. Run all papers with `--llm`; manually review what remains in `review.csv`.
 
 Full text matters: abstracts often omit the tests used, which is why those papers land in `REVIEW`.
+
+## Embedding classifier for full texts (scripts/)
+
+Local PubMedBERT sentence embeddings (chunked full text, mean-pooled, plus first-chunk pool) feed a logistic-regression head that outputs 0/1.
+
+```bash
+python scripts/build_corpus.py --package <fulltext_package> --gold-dir <extracted> --gold-pdf-dir <gold pdfs> --out data/corpus.jsonl
+python scripts/train_and_classify.py --model <local NeuML/pubmedbert-base-embeddings dir> --out out
+python scripts/summarize.py --out out      # summary.md + summary.png
+```
+
+Training labels: curated papers = 1; papers the rule stage confidently excludes = 0. The head is trained with source-balanced weights so the text source (XML/TXT/PDF) cannot act as a shortcut. Training papers get out-of-fold predictions. Data and outputs are git-ignored.
