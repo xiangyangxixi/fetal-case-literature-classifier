@@ -50,3 +50,13 @@ python scripts/summarize.py --out out      # summary.md + summary.png
 ```
 
 Training labels: curated papers = 1; papers the rule stage confidently excludes = 0. The head is trained with source-balanced weights so the text source (XML/TXT/PDF) cannot act as a shortcut. Training papers get out-of-fold predictions. Data and outputs are git-ignored.
+
+## Standalone inference (no Claude)
+
+`weights/` (created by `python scripts/export_weights.py`) holds the exported head: `head_v3.npz` (1536 coefficients + intercept), `config.json` (embedding model, chunking, pooling, threshold, validation metrics). Classify any folder of xml/txt/pdf full texts:
+
+```bash
+casefilter predict <folder> --weights weights --model <local NeuML/pubmedbert-base-embeddings dir> --out out/predict.csv
+```
+
+Output columns: file, pmid, source, n_chars, stub, prob, label (prob >= 0.5). Re-running on 12 training-set papers reproduced the stored probabilities within 0.044 and all 12 labels.

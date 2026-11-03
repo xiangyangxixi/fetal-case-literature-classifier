@@ -6,3 +6,4 @@ out/
 data/
 *.cache.jsonl
 models/
+weights/

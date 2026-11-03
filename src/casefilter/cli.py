@@ -24,6 +24,13 @@ def run(args):
     print(f"results written to {args.out}/")
 
 
+def predict(args):
+    from .predict import predict_folder
+    rows = predict_folder(args.folder, args.weights, args.model, args.device, args.out)
+    pos = sum(r["label"] for r in rows)
+    print(f"papers={len(rows)}  label1={pos}  label0={len(rows) - pos}  -> {args.out}")
+
+
 def evaluate(args):
     """Compare all.csv with a gold CSV (pmid,label); label is 1/0 or INCLUDE/EXCLUDE."""
     with open(args.pred, encoding="utf-8-sig") as f:
@@ -55,6 +62,13 @@ def main(argv=None):
     r.add_argument("--cache", default="llm.cache.jsonl")
     r.add_argument("--workers", type=int, default=8)
     r.set_defaults(fn=run)
+    pr = sub.add_parser("predict", help="classify full-text files (xml/txt/pdf) with the exported weights, no Claude")
+    pr.add_argument("folder")
+    pr.add_argument("--weights", default="weights")
+    pr.add_argument("--model", default=None, help="local path of the PubMedBERT embedding model")
+    pr.add_argument("--device", default="cpu")
+    pr.add_argument("--out", default="out/predict.csv")
+    pr.set_defaults(fn=predict)
     e = sub.add_parser("eval", help="precision/recall against a labelled gold file")
     e.add_argument("pred", help="out/all.csv")
     e.add_argument("gold", help="CSV with pmid,label")
