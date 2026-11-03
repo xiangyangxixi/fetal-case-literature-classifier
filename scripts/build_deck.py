@@ -126,7 +126,7 @@ def callouts(slide, texts, x=8.92, y0=1.55, step=1.05):
 
 def toc(active):
     s = clone(T_TOC)
-    names = ["任务与入库标准", "分类器设计", "训练过程", "结果与总结"]
+    names = globals().get("TOC_NAMES", ["任务与入库标准", "分类器设计", "训练过程", "结果与总结"])
     rects = [find(s.shapes, n) for n in ("矩形 19", "矩形 26", "矩形 33", "矩形 61")]
     act_rpr = copy.deepcopy(find(T_TOC.shapes, "矩形 19").text_frame.paragraphs[0].runs[0]._r.find(A + "rPr"))
     off_rpr = copy.deepcopy(find(T_TOC.shapes, "矩形 26").text_frame.paragraphs[0].runs[0]._r.find(A + "rPr"))
